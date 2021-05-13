@@ -14,7 +14,7 @@
 #include <string>
 #include <algorithm>
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  10  
+#define TIME_TO_SLEEP  60  
 
 
 RTC_DATA_ATTR unsigned long entry;
@@ -70,6 +70,7 @@ RTC_DATA_ATTR class MyClientCallback : public BLEClientCallbacks {
   void onDisconnect(BLEClient* pclient) {
     connected = false;
     Serial.println("onDisconnect");
+   // ESP.restart();
   }
 };
 
@@ -117,7 +118,8 @@ RTC_DATA_ATTR bool connectToServer() {
       Serial.println(value.c_str());
       std::copy(value.begin(), value.end(), TemperatureServer);
       TemperatureServer[value.size()] = '\0';
-    
+      delay (5);
+
           }
       // obtain a reference to battery level characteristic
       pRemoteCharacteristic_jutikliobat = pRemoteService->getCharacteristic(charUUID1);
@@ -135,7 +137,8 @@ RTC_DATA_ATTR bool connectToServer() {
       Serial.print("The characteristic battery value was: ");
       Serial.println(value1.c_str());
       std::copy(value1.begin(), value1.end(), BatteryServer);
-      BatteryServer[value1.size()] = '\0';    
+      BatteryServer[value1.size()] = '\0';
+      delay (5);    
       }
       else Serial.print ("Cannot read the characteristic");
 
@@ -152,13 +155,9 @@ RTC_DATA_ATTR bool connectToServer() {
     if(pRemoteCharacteristic_jutikliomiegui->canWrite()) {
       Serial.println("Sending instruction to go to sleep");
       pRemoteCharacteristic_jutikliomiegui->writeValue((byte)0x01);
+      delay (5);
     }
       
-   /* if(pRemoteCharacteristic_temp->canNotify())
-      pRemoteCharacteristic_temp->registerForNotify(notifyCallback);
-    if(pRemoteCharacteristic_jutikliobat->canNotify())
-      pRemoteCharacteristic_jutikliobat->registerForNotify(notifyCallback); */
-
     connected = true;
     return true;
     pClient->disconnect();
@@ -207,7 +206,9 @@ void setup() {
 
 connectToServer();
 Serial.println("Got the data, disconnecting from server.");
-
+/*esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
+            Serial.println("Sensor is going to sleep");
+            esp_deep_sleep_start();*/
 
  // charakteristikos
   Serial.println("Creating BLE server!");
@@ -252,23 +253,26 @@ Serial.println("Got the data, disconnecting from server.");
   pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
-
+            delay(15);
             Characteristic_Temperatura->setValue(TemperatureServer); //set characteristic value 
           //  Characteristic_Temperatura->notify(); // send value
             Serial.println("Serverio ismatuota temperatura");
             Serial.println(TemperatureServer);
+            delay (5);
             Characteristic_BatteryServer->setValue(BatteryServer); //set characteristic value 
          //   Characteristic_BatteryServer->notify(); // send value
             Serial.println("Serverio baterijos lygis");
             Serial.println(BatteryServer);
+            delay (5);
             float BatteryRelay; float batRelay; char batRelayString[3];
             BatteryRelay=analogRead(batpin);
             Serial.println(batRelayString);
             batRelay=(BatteryRelay*(3.3/4095)*2.73);
-            dtostrf(batRelay, 3, 1, batRelayString);//float_val, min_width, digits_after_decimal, char_buffer
+            dtostrf(batRelay, 3, 2, batRelayString);//float_val, min_width, digits_after_decimal, char_buffer
             Serial.println("Tarpinio mazgo baterijos lygis");
             Serial.println(batRelayString);
-            Characteristic_BatteryRelay->setValue(batRelayString); //set characteristic value 
+            Characteristic_BatteryRelay->setValue(batRelayString); //set characteristic value
+            delay (50); 
          //   Characteristic_BatteryRelay->notify(); // send value
             while (1){
          std::string sleepflag = Characteristic_Sleep->getValue();
