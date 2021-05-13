@@ -4,7 +4,7 @@
     updates by chegewara
 */
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-#define TIME_TO_SLEEP  15  
+#define TIME_TO_SLEEP  60
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
@@ -45,13 +45,10 @@ DallasTemperature sensors(&oneWire);
 
 sensors.begin();// Start the DS18B20 sensor
  delay(2000);
-    Serial.println("Measure");
+    Serial.println("Measure temperature");
    sensors.requestTemperatures(); 
   float temperatureC = sensors.getTempCByIndex(0);
-/*  String hi = (String)temperatureC;
-    hi.toCharArray(valueStr, 5);
-    Serial.println(valueStr);*/
-    Serial.println(temperatureC);
+
     
  batValue= analogRead(batpin); // matuojamas baterijos lygis
   
@@ -97,18 +94,19 @@ sensors.begin();// Start the DS18B20 sensor
             char txString[5]; 
             char BatterylevelString[3];
             dtostrf(temperatureC, 2, 1, txString); // float_val, min_width, digits_after_decimal, char_buffer
-             Serial.println(txString);
+            delay (5);
             Characteristic_T->setValue(txString); //set characteristic value 
-          //  Characteristic_T->notify(); // send value
+           
             batValue= analogRead(batpin);
-            Serial.println(batValue);
+            
             batVolts=(batValue*(3.3/4095)*2.73); //LSB * 9 / 3,3 V
-            Serial.println("baterijos lygis voltais");
+            Serial.println("Battery level ");
             Serial.println(batVolts);
-            dtostrf(batVolts, 3, 1, BatterylevelString); // float_val, min_width, digits_after_decimal, char_buffer
-            delay(1000);
+            Serial.print(" V");
+            dtostrf(batVolts, 4, 2, BatterylevelString); // float_val, min_width, digits_after_decimal, char_buffer
             Characteristic_Battery->setValue(BatterylevelString);
-         //   Characteristic_Battery->notify();
+            delay (5);
+         
        
          while (1){
          std::string sleepflag = Characteristic_Sleep->getValue();
