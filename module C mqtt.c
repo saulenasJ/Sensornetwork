@@ -13,11 +13,11 @@
 #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
 #define TIME_TO_SLEEP  10  
 #define ssid          "Ka sakei?"
-#define password      "nesakysiu"
+#define password      "********"
 #define SERVER          "io.adafruit.com"
 #define SERVERPORT      1883
 #define MQTT_USERNAME   "SJuociunas"
-#define MQTT_KEY        "aio_RAdw714OGpv8qKU5oYc9tnqgMt0J"
+#define MQTT_KEY        "***********"
 #define USERNAME          "SJuociunas/"
 #define PREAMBLE          "feeds/"
 #define T_TEMPERATURE      "temperatura"
@@ -232,7 +232,7 @@ RTC_DATA_ATTR bool connectToServer() {
     dtostrf(batServer, 3, 1, batServerString);//float_val, min_width, digits_after_decimal, char_buffer    
     Serial.println("Temperature value is ");
     Serial.print(TemperatureSensor);
-    Serial.print("°C");
+    Serial.print("Â°C");
     Serial.println("");
     Serial.println("Sensor battery value is ");
     Serial.print(BatterySensor);
